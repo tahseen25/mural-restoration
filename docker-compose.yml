@@ -1,0 +1,81 @@
+version: '3.9'
+
+# ── Mural Restoration Platform — Docker Compose ───────────────
+# Usage:
+#   cp backend/.env.example backend/.env   (then fill in values)
+#   docker compose up -d --build
+
+services:
+
+  # ── MongoDB ─────────────────────────────────────────────────
+  mongo:
+    image: mongo:7.0
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS:-changeme_in_prod}
+      MONGO_INITDB_DATABASE: mural_restoration
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"    # remove in production (only expose to internal network)
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Backend ──────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: ./backend/.env
+    environment:
+      MONGODB_URI: mongodb://${MONGO_USER:-admin}:${MONGO_PASS:-changeme_in_prod}@mongo:27017/mural_restoration?authSource=admin
+      MODEL_SERVICE_URL: http://model:8000
+      NODE_ENV: production
+    ports:
+      - "5000:5000"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    volumes:
+      - backend_logs:/app/logs
+
+  # ── Model inference server ───────────────────────────────────
+  model:
+    build:
+      context: ./model
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./model/checkpoints:/app/checkpoints:ro   # mount trained weights
+    # Uncomment below for GPU support (requires nvidia-container-toolkit)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  # ── Frontend ─────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:5000/api   # adjust for your domain
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:
+  backend_logs:

@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Google Fonts already loaded via index.html ── */
+
+@layer base {
+  :root {
+    --ink:   #0f0e0b;
+    --cream: #faf7f2;
+    --ochre: #c8822a;
+    --sage:  #6b7f5a;
+    --clay:  #b54e2d;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    @apply bg-cream font-body text-ink antialiased;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  }
+
+  h1,h2,h3,h4 { @apply font-display; }
+
+  ::selection { background: #c8822a33; }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar       { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #edeae0; }
+  ::-webkit-scrollbar-thumb { background: #bdb38e; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #c8822a; }
+}
+
+@layer components {
+  /* ── Buttons ─────────────────────────────── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           bg-ochre text-cream font-body font-medium
+           px-5 py-2.5 rounded-sm
+           transition-all duration-200
+           hover:bg-ochre-600 active:scale-[0.98]
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2
+           border border-ink/20 text-ink font-body font-medium
+           px-5 py-2.5 rounded-sm bg-transparent
+           transition-all duration-200
+           hover:border-ink/50 hover:bg-ink/5 active:scale-[0.98]
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center gap-1.5 text-ink/60
+           font-body text-sm transition-colors duration-150
+           hover:text-ink;
+  }
+
+  /* ── Cards ───────────────────────────────── */
+  .card {
+    @apply bg-white/80 backdrop-blur-sm rounded-sm border border-ink/8
+           shadow-warm transition-shadow duration-200;
+  }
+
+  .card-hover {
+    @apply card hover:shadow-warm-lg hover:-translate-y-0.5
+           transition-all duration-200;
+  }
+
+  /* ── Form elements ───────────────────────── */
+  .input {
+    @apply w-full px-3.5 py-2.5 rounded-sm
+           border border-ink/20 bg-white/60
+           font-body text-ink placeholder:text-ink/40
+           focus:outline-none focus:ring-2 focus:ring-ochre/40 focus:border-ochre
+           transition-all duration-150;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-ink/70 mb-1.5;
+  }
+
+  /* ── Badge ───────────────────────────────── */
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5
+           text-xs font-mono rounded-full;
+  }
+
+  .badge-ochre { @apply badge bg-ochre/15 text-ochre-700; }
+  .badge-sage  { @apply badge bg-sage/15  text-sage-700; }
+  .badge-clay  { @apply badge bg-clay/15  text-clay-700; }
+  .badge-ink   { @apply badge bg-ink/10   text-ink/80; }
+
+  /* ── Section heading ─────────────────────── */
+  .section-label {
+    @apply text-xs font-mono font-medium tracking-widest uppercase
+           text-ink/40;
+  }
+
+  /* ── Divider ─────────────────────────────── */
+  .divider {
+    @apply border-t border-ink/8;
+  }
+
+  /* ── Page wrapper ────────────────────────── */
+  .page {
+    @apply min-h-screen px-4 sm:px-6 lg:px-8 py-10 max-w-7xl mx-auto;
+  }
+}
+
+/* ── Animations ───────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position:  200% 0; }
+}
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+
+.animate-fade-up     { animation: fadeUp 0.4s ease both; }
+.animate-shimmer     {
+  background: linear-gradient(90deg, #edeae0 25%, #f7f5f0 50%, #edeae0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite;
+}
+.animate-spin-slow   { animation: spin-slow 3s linear infinite; }
+
+/* stagger children */
+.stagger > *:nth-child(1) { animation-delay: 0ms; }
+.stagger > *:nth-child(2) { animation-delay: 60ms; }
+.stagger > *:nth-child(3) { animation-delay: 120ms; }
+.stagger > *:nth-child(4) { animation-delay: 180ms; }
+.stagger > *:nth-child(5) { animation-delay: 240ms; }
+.stagger > *:nth-child(6) { animation-delay: 300ms; }
